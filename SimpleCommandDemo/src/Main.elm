@@ -1,23 +1,24 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, img)
-import Html.Attributes exposing (src)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 ---- MODEL ----
 
 
 type alias Model =
-    {
-        clickCount: Int
+    { clickCount : Int
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {
-        clickCount = 0
-    }, Cmd.none )
+    ( { clickCount = 0
+      }
+    , Cmd.none
+    )
 
 
 
@@ -25,13 +26,17 @@ init =
 
 
 type Msg
-    = NoOp
-
+    = IncrementClickCount
+    | DecrementClickCount
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        IncrementClickCount ->
+            ( { model | clickCount = model.clickCount + 1 }, Cmd.none )
 
+        DecrementClickCount ->
+            ( { model | clickCount = model.clickCount - 1 }, Cmd.none )
 
 
 ---- VIEW ----
@@ -42,6 +47,16 @@ view model =
     div []
         [ img [ src "/logo.svg" ] []
         , h1 [] [ text <| "The click count is " ++ (toString model.clickCount) ]
+        , button
+            [ class "btn"
+            , onClick IncrementClickCount
+            ]
+            [ text "Increment the click count" ]
+        , button
+            [ class "btn"
+            , onClick DecrementClickCount
+            ]
+            [ text "Decrement the click count" ]
         ]
 
 
