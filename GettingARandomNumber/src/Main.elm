@@ -13,23 +13,22 @@ type alias Model =
     { randomNumber : Int
     , lowInputVal : String
     , highInputVal : String
-    , low: Int
-    , high: Int
     }
 
 
 init : ( Model, Cmd Msg )
 init =
     let
-        low = 1
-        high = 50
+        low =
+            1
+
+        high =
+            50
     in
         ( { randomNumber = 0
-        , lowInputVal = toString low
-        , highInputVal = toString high
-        , low = low
-        , high = high
-        }
+          , lowInputVal = toString low
+          , highInputVal = toString high
+          }
         , Cmd.none
         )
 
@@ -45,13 +44,48 @@ type Msg
     | HighInputChanged String
 
 
+getRandomRange : Model -> Maybe ( Int, Int )
+getRandomRange model =
+    case String.toInt model.lowInputVal of
+        Err _ ->
+            Nothing
+
+        Ok low ->
+            case String.toInt model.highInputVal of
+                Err _ ->
+                    Nothing
+
+                Ok high ->
+                    if (low <= high) then
+                        Just ( low, high )
+                    else
+                        Nothing
+
+
+isValidRandomRange : Model -> Bool
+isValidRandomRange model =
+    case getRandomRange model of
+        Just _ ->
+            True
+
+        Nothing ->
+            False
+
+isInvalidRandomRange: Model -> Bool
+isInvalidRandomRange = not << isValidRandomRange
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GetRandomNumber ->
             let
                 cmd =
-                    generate GotRandomNumber (int model.low model.high)
+                    case getRandomRange model of
+                        Nothing ->
+                            Cmd.none
+
+                        Just ( low, high ) ->
+                            generate GotRandomNumber (int low high)
             in
                 ( model, cmd )
 
@@ -59,24 +93,11 @@ update msg model =
             ( { model | randomNumber = n }, Cmd.none )
 
         LowInputChanged val ->
-            case String.toInt val of
-                Err _ -> (model, Cmd.none)
-                Ok v ->
-                    if (v <= model.high)
-                    then
-                        ( { model | lowInputVal = val, low = v }, Cmd.none )
-                    else
-                        ( model, Cmd.none)
+            ( { model | lowInputVal = val }, Cmd.none )
 
         HighInputChanged val ->
-            case String.toInt val of
-                Err _ -> (model, Cmd.none)
-                Ok v ->
-                    if (v >= model.low)
-                    then
-                        ( { model | highInputVal = val, high = v }, Cmd.none )
-                    else
-                        (model, Cmd.none)
+            ( { model | highInputVal = val }, Cmd.none )
+
 
 
 ---- VIEW ----
@@ -105,11 +126,13 @@ view model =
                 "Your random number is "
                     ++ (toString model.randomNumber)
             , numberInput "From:" model.lowInputVal LowInputChanged
-            , div [][text (toString model.low)]
             , numberInput "To:" model.highInputVal HighInputChanged
-            , div [][text (toString model.high)]
             , div []
-                [ button [ onClick GetRandomNumber ] [ text "Get Number" ]
+                [ button
+                    [ onClick GetRandomNumber
+                    , disabled (isInvalidRandomRange model)
+                    ]
+                    [ text "Get Number" ]
                 ]
             ]
         ]
