@@ -71,8 +71,11 @@ isValidRandomRange model =
         Nothing ->
             False
 
-isInvalidRandomRange: Model -> Bool
-isInvalidRandomRange = not << isValidRandomRange
+
+isInvalidRandomRange : Model -> Bool
+isInvalidRandomRange =
+    not << isValidRandomRange
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -117,24 +120,30 @@ numberInput label_text val message =
         ]
 
 
+showRandomNumber : Model -> Html Msg
+showRandomNumber model =
+    div []
+        [ text <| "Your random number is " ++ (toString model.randomNumber)
+        ]
+
+showButton : Model -> Html Msg
+showButton model =
+    div []
+        [ button
+            [ onClick GetRandomNumber
+            , disabled (isInvalidRandomRange model)
+            ]
+            [ text "Get Number" ]
+        ]
+
 view : Model -> Html Msg
 view model =
     div [ style [ ( "font-size", "20pt" ), ( "margin-left", "20px" ) ] ]
         [ h1 [] [ text "Getting a Random Number is Impure" ]
-        , div []
-            [ text <|
-                "Your random number is "
-                    ++ (toString model.randomNumber)
-            , numberInput "From:" model.lowInputVal LowInputChanged
-            , numberInput "To:" model.highInputVal HighInputChanged
-            , div []
-                [ button
-                    [ onClick GetRandomNumber
-                    , disabled (isInvalidRandomRange model)
-                    ]
-                    [ text "Get Number" ]
-                ]
-            ]
+        , numberInput "From:" model.lowInputVal LowInputChanged
+        , numberInput "To:" model.highInputVal HighInputChanged
+        , showButton model
+        , showRandomNumber model
         ]
 
 
