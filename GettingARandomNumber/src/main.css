@@ -13,3 +13,21 @@ img {
   margin: 20px 0;
   max-width: 200px;
 }
+
+label {
+  display: inline-block;
+  text-align: right;
+  width: 100px;
+  margin-right: 10px;
+}
+
+button {
+  font-size: 20pt;
+  margin-top: 20px;
+}
+
+input[type='number'] {
+  font-size: 20pt;
+  text-align: right;
+  width: 200px;
+}
