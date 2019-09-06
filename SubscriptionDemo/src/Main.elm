@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Time exposing (..)
-
+import Time.Format exposing (..)
 
 ---- MODEL ----
 
@@ -60,7 +60,7 @@ getTimeDisplay: Maybe Time.Time -> String
 getTimeDisplay mTime =
     case mTime of
         Nothing -> "Not set"
-        Just t -> toString t
+        Just t -> format "%I:%M:%S %p" t
 
 showTimeSubscription : Model -> Html Msg
 showTimeSubscription model =
@@ -88,7 +88,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
 
     let timeSub = if (model.timeSubscriptionEnabled)
-                        then Time.every (5 * Time.second) GotTimeEvent
+                        then Time.every (1 * Time.second) GotTimeEvent
                         else Sub.none
     in
         timeSub
