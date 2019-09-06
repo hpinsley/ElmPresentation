@@ -5,13 +5,14 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Time exposing (..)
 import Time.Format exposing (..)
-
+import Mouse
 ---- MODEL ----
 
 
 type alias Model =
     { currentTime : Maybe Time
     , timeSubscriptionEnabled : Bool
+    , mouseSubscriptionEnabled: Bool
     }
 
 
@@ -19,6 +20,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { currentTime = Nothing
       , timeSubscriptionEnabled = False
+      , mouseSubscriptionEnabled = False
       }
     , Cmd.none
     )
@@ -31,6 +33,7 @@ init =
 type Msg
     = ToggleTimeSubscription
     | GotTimeEvent Time.Time
+    | ToggleMouseSubscription
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -42,7 +45,8 @@ update msg model =
         GotTimeEvent currentTime ->
             ( { model | currentTime = Just currentTime }, Cmd.none )
 
-
+        ToggleMouseSubscription ->
+            ( { model | mouseSubscriptionEnabled = not model.mouseSubscriptionEnabled }, Cmd.none )
 
 ---- VIEW ----
 
@@ -53,6 +57,7 @@ view model =
         [ h1 []
             [ text "Subscription Demo"
             , showTimeSubscription model
+            , showMouseSubscription model
             ]
         ]
 
@@ -62,17 +67,15 @@ getTimeDisplay mTime =
         Nothing -> "Not set"
         Just t -> format "%I:%M:%S %p" t
 
+onOff: Bool -> String
+onOff bool =
+    if (bool) then "On" else "Off"
+
 showTimeSubscription : Model -> Html Msg
 showTimeSubscription model =
     div []
         [ h2 []
-            [ text <|
-                "Time subscription is "
-                    ++ (if model.timeSubscriptionEnabled then
-                            "On"
-                        else
-                            "Off"
-                       )
+            [ text <| "Time subscription is " ++ (onOff model.timeSubscriptionEnabled)
             ]
         , br [] []
         , button [ onClick ToggleTimeSubscription ] [ text "Toggle time subscription" ]
@@ -80,6 +83,19 @@ showTimeSubscription model =
         , getTimeDisplay model.currentTime
             |> (++) "The time is "
             |> text
+        , hr [] []
+        ]
+
+
+showMouseSubscription : Model -> Html Msg
+showMouseSubscription model =
+    div []
+        [ h2 []
+            [ text <| "Mouse subscription is " ++ (onOff model.mouseSubscriptionEnabled)
+            ]
+        , br [] []
+        , button [ onClick ToggleMouseSubscription ] [ text "Toggle mouse subscription" ]
+        , hr [] []
         , hr [] []
         ]
 
