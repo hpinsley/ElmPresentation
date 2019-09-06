@@ -30,14 +30,19 @@ init =
 
 type Msg
     = ToggleTimeSubscription
+    | GotTimeEvent Time.Time
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-
         ToggleTimeSubscription ->
-            ({ model | timeSubscriptionEnabled = not model.timeSubscriptionEnabled }, Cmd.none)
+            ( { model | timeSubscriptionEnabled = not model.timeSubscriptionEnabled }, Cmd.none )
+
+        GotTimeEvent currentTime ->
+            ( model, Cmd.none )
+
+
 
 ---- VIEW ----
 
@@ -51,20 +56,31 @@ view model =
             ]
         ]
 
+getTimeDisplay: Maybe Time.Time -> String
+getTimeDisplay mTime =
+    case mTime of
+        Nothing -> "Not set"
+        Just t -> toString t
 
 showTimeSubscription : Model -> Html Msg
 showTimeSubscription model =
     div []
         [ h2 []
-            [ text <| "Time subscription is "
-                ++ (if model.timeSubscriptionEnabled then
-                        "On"
-                    else
-                        "Off"
-                   )
-            , br [] []
-            , button [onClick ToggleTimeSubscription] [ text "Toggle time subscription" ]
+            [ text <|
+                "Time subscription is "
+                    ++ (if model.timeSubscriptionEnabled then
+                            "On"
+                        else
+                            "Off"
+                       )
             ]
+        , br [] []
+        , button [ onClick ToggleTimeSubscription ] [ text "Toggle time subscription" ]
+        , hr [] []
+        , getTimeDisplay model.currentTime
+            |> (++) "The time is "
+            |> text
+        , hr [] []
         ]
 
 

@@ -13,3 +13,11 @@ img {
   margin: 20px 0;
   max-width: 200px;
 }
+
+button {
+  font-size: 20pt;
+  border-radius: 10px;
+  color: blue;
+  background-color: lightgray;
+  border: 2px solid black;
+}
