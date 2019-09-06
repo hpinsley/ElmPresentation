@@ -40,7 +40,7 @@ update msg model =
             ( { model | timeSubscriptionEnabled = not model.timeSubscriptionEnabled }, Cmd.none )
 
         GotTimeEvent currentTime ->
-            ( model, Cmd.none )
+            ( { model | currentTime = Just currentTime }, Cmd.none )
 
 
 
@@ -86,8 +86,12 @@ showTimeSubscription model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
 
+    let timeSub = if (model.timeSubscriptionEnabled)
+                        then Time.every (5 * Time.second) GotTimeEvent
+                        else Sub.none
+    in
+        timeSub
 
 
 ---- PROGRAM ----
@@ -99,5 +103,5 @@ main =
         { view = view
         , init = init
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
