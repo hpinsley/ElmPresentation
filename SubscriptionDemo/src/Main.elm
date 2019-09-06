@@ -13,6 +13,7 @@ type alias Model =
     { currentTime : Maybe Time
     , timeSubscriptionEnabled : Bool
     , mouseSubscriptionEnabled: Bool
+    , mousePosition: Maybe Mouse.Position
     }
 
 
@@ -21,6 +22,7 @@ init =
     ( { currentTime = Nothing
       , timeSubscriptionEnabled = False
       , mouseSubscriptionEnabled = False
+      , mousePosition = Nothing
       }
     , Cmd.none
     )
@@ -34,6 +36,7 @@ type Msg
     = ToggleTimeSubscription
     | GotTimeEvent Time.Time
     | ToggleMouseSubscription
+    | MouseMove Mouse.Position
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -46,7 +49,16 @@ update msg model =
             ( { model | currentTime = Just currentTime }, Cmd.none )
 
         ToggleMouseSubscription ->
-            ( { model | mouseSubscriptionEnabled = not model.mouseSubscriptionEnabled }, Cmd.none )
+            let
+                enabled = not model.mouseSubscriptionEnabled
+                model_ = if enabled
+                                then { model | mouseSubscriptionEnabled = True }
+                                else { model | mouseSubscriptionEnabled = False, mousePosition = Nothing }
+            in
+                (model_, Cmd.none)
+
+        MouseMove position ->
+            ( { model | mousePosition = Just position } , Cmd.none )
 
 ---- VIEW ----
 
@@ -86,28 +98,38 @@ showTimeSubscription model =
         , hr [] []
         ]
 
-
 showMouseSubscription : Model -> Html Msg
 showMouseSubscription model =
-    div []
-        [ h2 []
-            [ text <| "Mouse subscription is " ++ (onOff model.mouseSubscriptionEnabled)
+    let
+        position = case model.mousePosition of
+                    Nothing -> "none"
+                    Just p -> (toString p)
+    in
+        div []
+            [ h2 []
+                [ text <| "Mouse subscription is " ++ (onOff model.mouseSubscriptionEnabled)
+                ]
+            , br [] []
+            , button [ onClick ToggleMouseSubscription ] [ text "Toggle mouse subscription" ]
+            , hr [] []
+            , text position
+            , hr [] []
             ]
-        , br [] []
-        , button [ onClick ToggleMouseSubscription ] [ text "Toggle mouse subscription" ]
-        , hr [] []
-        , hr [] []
-        ]
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
 
-    let timeSub = if (model.timeSubscriptionEnabled)
+    let
+        timeSub = if (model.timeSubscriptionEnabled)
                         then Time.every (1 * Time.second) GotTimeEvent
                         else Sub.none
+
+        mouseSub = if (model.mouseSubscriptionEnabled)
+                    then Mouse.moves MouseMove
+                    else Sub.none
     in
-        timeSub
+        Sub.batch [timeSub, mouseSub]
 
 
 ---- PROGRAM ----

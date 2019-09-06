@@ -16,8 +16,5 @@ img {
 
 button {
   font-size: 20pt;
-  border-radius: 10px;
   color: blue;
-  background-color: lightgray;
-  border: 2px solid black;
 }
