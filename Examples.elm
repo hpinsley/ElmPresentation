@@ -40,8 +40,49 @@ square x = x * x
 doubleThenSquare = double >> square
 squareThenDouble = double << square
 
+doubleThenSquare 3
+squareThenDouble 3
+--------------------
+--The Maybe type
+--------------------
 
---String.toInt
+List.head [1,2,3]
+List.head []
+
+case List.head [123] of
+    Just v -> v
+    Nothing -> 0
+
+-- List.filterMap -- if you have a list of maybes
+-- Get the heads each embedded list
+[[1,2,3],[4,5,6],[],[7,8,9]]
+    |> List.map List.head
+
+[[1,2,3],[4,5,6],[],[7,8,9]]
+    |> List.filterMap List.head
+
+--String.toInt and introduction to the Result type
+
+String.toInt "abc"
+String.toFloat "123.5"
+
+["3", "hi", "12", "4th", "May"]
+    |> List.map String.toInt
+    |> List.filterMap Result.toMaybe
+
+Ok 1 |> Result.toMaybe
+Err "this error will be dropped" |> Result.toMaybe
+
+String.toInt >> Result.toMaybe
+parseInt = String.toInt >> Result.toMaybe
+
+List.filterMap parseInt ["3", "hi", "12", "4th", "May"]
+["3", "hi", "12", "4th", "May"] |> List.filterMap parseInt
+
+-- Pattern matching
+case String.toInt "321" of
+    Err msg -> "got the following error: " ++ msg
+    Ok n -> "Got a valid integer.  It's value is " ++ (toString n)
 
 -- Uppercase functions (no body arise in two scenarios)
 
@@ -60,17 +101,21 @@ type alias Customer =
 
 -- Customer will be a function
 
--- Decoders
+-- Json Decoders
 
 
 The float is a decoder.  It says what we expect
 
-> import Json.Decode exposing (..)
-> import Json.Decode.Pipeline exposing (..)
-> decodeString float "3.13"
+import Json.Decode exposing (..)
+import Json.Decode.Pipeline exposing (..)
 
-decodeString (list int) "[1,2,3]"
-(here list is a function and int is a decoder)
+type alias User =
+  { id : Int
+  , email : Maybe String
+  , name : String
+  , percentExcited : Float
+  }
+
 
 Everything is immutable
 Everything is an expression
