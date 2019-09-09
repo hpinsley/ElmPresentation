@@ -1,3 +1,11 @@
+-- Elm Benchmarks
+https://elm-lang.org/news/blazing-fast-html-round-two
+-- Redux Prior Art
+https://redux.js.org/introduction/prior-art
+-- Nice description of the architecture
+http://toreto.re/tea/
+
+
 -- Partial application and how to read function annotations.
 
 List.map
