@@ -101,13 +101,8 @@ type alias Customer =
 
 -- Customer will be a function
 
--- Json Decoders
 
-
-The float is a decoder.  It says what we expect
-
-import Json.Decode exposing (..)
-import Json.Decode.Pipeline exposing (..)
+-- Records
 
 type alias User =
   { id : Int
@@ -116,6 +111,30 @@ type alias User =
   , percentExcited : Float
   }
 
+User
+
+dave = User 1 (Just "david@gmail.com") "David" 50.0
+dave2 = User 1 (Just "david@gmail.com") "David" 50.0
+dave3 = { id = 1, email = (Just "david@gmail.com"), name = "David", percentExcited = 50.0 }
+
+getEmail userRecord =
+    case userRecord.email of
+        Just address -> address
+        Nothing -> "Email address not on file."
+
+getEmail dave
+getEmail dave3
+
+-- Json Decoders
+import Json.Decode exposing (..)
+import Json.Decode.Pipeline exposing (..)
+
+userDecoder =
+  decode User
+    |> required "id" int
+    |> required "email" (nullable string) -- `null` decodes to `Nothing`
+    |> optional "name" string "(fallback if name is `null` or not present)"
+    |> hardcoded 1.0
 
 Everything is immutable
 Everything is an expression
