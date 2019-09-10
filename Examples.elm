@@ -101,7 +101,6 @@ type alias Customer =
 
 -- Customer will be a function
 
-
 -- Records
 
 type alias User =
@@ -117,6 +116,9 @@ dave = User 1 (Just "david@gmail.com") "David" 50.0
 dave2 = User 1 (Just "david@gmail.com") "David" 50.0
 dave3 = { id = 1, email = (Just "david@gmail.com"), name = "David", percentExcited = 50.0 }
 
+dave == dave2
+dave == dave3
+
 getEmail userRecord =
     case userRecord.email of
         Just address -> address
@@ -124,6 +126,16 @@ getEmail userRecord =
 
 getEmail dave
 getEmail dave3
+
+-- Nice little helpers.  Each field becomes a function
+.email dave
+
+dave |> .email |> Maybe.withDefault "No email"
+
+type alias Person = {
+     name: String
+    ,email: String
+}
 
 -- Json Decoders
 import Json.Decode exposing (..)
@@ -136,7 +148,48 @@ userDecoder =
     |> optional "name" string "(fallback if name is `null` or not present)"
     |> hardcoded 1.0
 
-Everything is immutable
+-- Valid record
+Json.Decode.decodeString
+  userDecoder
+  """
+    {"id": 123, "email": "sam@example.com", "name": "Sam Sample"}
+  """
+
+-- Valid record with no optional email
+Json.Decode.decodeString
+  userDecoder
+  """
+    {"id": 123, "email": null, "name": "Sam Sample"}
+  """
+-- Valid
+Json.Decode.decodeString
+  userDecoder
+  """
+    {"id": 123, "email": null, "name": "Sam Sample"}
+  """
+
+-- Null email is valid
+Json.Decode.decodeString
+  userDecoder
+  """
+    {"id": 123, "email": null, "name": "Sam Sample"}
+  """
+
+-- Missing email is invalid
+Json.Decode.decodeString
+  userDecoder
+  """
+    {"id": 123, "name": "Sam Sample"}
+  """
+
+-- Invalid - null or missing name
+Json.Decode.decodeString
+  userDecoder
+  """
+    {"id": 123, "email": null, "name": null}
+  """
+
+    Everything is immutable
 Everything is an expression
 Functions guarantee same results with same inputs
 Functions do not cause side effects (no modifiying external state)
