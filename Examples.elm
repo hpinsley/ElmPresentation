@@ -84,20 +84,41 @@ case String.toInt "321" of
     Err msg -> "got the following error: " ++ msg
     Ok n -> "Got a valid integer.  It's value is " ++ (toString n)
 
+-- Algebraic data types
 -- Uppercase functions (no body arise in two scenarios)
+-- Sum types and product types
+-- Msg is a sum type
+-- Message String is a product type
 
 type Msg
-    = Single
-    | Message String
+    = GetData String
+    | GotData (Result String (String, Int))
 
---Message is a function
---Record types too
+-- All these are valid Msg values
+GetData "howard"
+GotData (Ok ("howard", 123))
+GotData (Err "The server is broken")
 
-type alias Customer =
-    {
-        name: String,
-        age: Int
-    }
+validData = GotData (Ok ("howard", 123))
+
+-- Define a function to parse a message into a tuple
+getTuple msg =
+    case msg of
+        GotData result ->
+            case result of
+                Ok tpl -> tpl
+                Err errMsg -> (errMsg, -1)
+        GetData forWhom ->
+            (forWhom, -2)
+
+getTuple
+getTuple (GetData "david")
+getTuple <| GotData (Err "The server is broken!")
+Ok ("Pilar", 17) |> GotData |> getTuple
+
+-- The last one worked because GotData is also an uppercase function
+GotData
+
 
 -- Customer will be a function
 
@@ -118,6 +139,12 @@ dave3 = { id = 1, email = (Just "david@gmail.com"), name = "David", percentExcit
 
 dave == dave2
 dave == dave3
+
+-- Records are immutable.  You create copies by altering the fields in a similar
+-- manner to the JS spread operator
+
+dave4 = { dave3 | email = "dave4@gmail.com" }
+dave3 == dave4
 
 getEmail userRecord =
     case userRecord.email of
