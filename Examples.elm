@@ -132,10 +132,13 @@ getEmail dave3
 
 dave |> .email |> Maybe.withDefault "No email"
 
-type alias Person = {
-     name: String
-    ,email: String
-}
+type alias Person =
+    {
+          name: String
+        , email: Int
+    }
+
+Person "Pilar" 314 |> .email
 
 -- Json Decoders
 import Json.Decode exposing (..)
@@ -188,6 +191,9 @@ Json.Decode.decodeString
   """
     {"id": 123, "email": null, "name": null}
   """
+
+HTTP/JSON - Example - NY Times Api...
+
 
     Everything is immutable
 Everything is an expression
