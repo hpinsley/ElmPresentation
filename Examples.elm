@@ -22,6 +22,9 @@ evens [1,2,3,4,5,6]
 
 --
 -- Pipelines
+List.map
+negate
+
 List.sort (List.map negate (List.filter (\n -> n % 2 == 0) [10,1,2,3,4,5]))
 
 [10,1,2,3,4,5]
@@ -42,16 +45,40 @@ squareThenDouble = double << square
 
 doubleThenSquare 3
 squareThenDouble 3
+
+-- More function composition.  Earlier example revisited
+
+[10,1,2,3,4,5]
+    |> List.filter (\n -> n %2 == 0)
+    |> List.map negate
+    |> List.sort
+
+isEven = (\n -> n % 2 == 0)
+
 --------------------
---The Maybe type
+--The Maybe type.  Say goodbye to undefined is not a function errors
 --------------------
 
 List.head [1,2,3]
 List.head []
 
-case List.head [123] of
+case List.head [1,2,3] of
     Just v -> v
     Nothing -> 0
+
+case List.head [] of
+    Just v -> v
+    Nothing -> 0
+
+-- Pattern matching with lists
+myhead lst =
+  case lst of
+    [] -> Nothing
+    head::tail -> Just head
+
+myhead [1,2,3]
+myhead []
+myhead ["a","b","c"]
 
 -- List.filterMap -- if you have a list of maybes
 -- Get the heads each embedded list
@@ -60,6 +87,11 @@ case List.head [123] of
 
 [[1,2,3],[4,5,6],[],[7,8,9]]
     |> List.filterMap List.head
+
+List.filterMap
+
+getListHeads = List.filterMap List.head
+getListHeads [[1,2,3],[4,5,6],[],[7,8,9]]
 
 --String.toInt and introduction to the Result type
 
@@ -81,8 +113,8 @@ List.filterMap parseInt ["3", "hi", "12", "4th", "May"]
 
 -- Pattern matching
 case String.toInt "321" of
-    Err msg -> "got the following error: " ++ msg
     Ok n -> "Got a valid integer.  It's value is " ++ (toString n)
+    Err msg -> "got the following error: " ++ msg
 
 -- Algebraic data types
 -- Uppercase functions (no body arise in two scenarios)
@@ -137,13 +169,14 @@ dave = User 1 (Just "david@gmail.com") "David" 50.0
 dave2 = User 1 (Just "david@gmail.com") "David" 50.0
 dave3 = { id = 1, email = (Just "david@gmail.com"), name = "David", percentExcited = 50.0 }
 
+-- Equality semantics
 dave == dave2
 dave == dave3
 
 -- Records are immutable.  You create copies by altering the fields in a similar
 -- manner to the JS spread operator
 
-dave4 = { dave3 | email = "dave4@gmail.com" }
+dave4 = { dave3 | email = Just "dave4@gmail.com" }
 dave3 == dave4
 
 getEmail userRecord =
@@ -152,10 +185,11 @@ getEmail userRecord =
         Nothing -> "Email address not on file."
 
 getEmail dave
-getEmail dave3
+getEmail dave4
 
 -- Nice little helpers.  Each field becomes a function
 .email dave
+.email
 
 dave |> .email |> Maybe.withDefault "No email"
 
