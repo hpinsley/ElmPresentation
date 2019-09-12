@@ -149,6 +149,13 @@ case String.toInt "321" of
     Ok n -> "Got a valid integer.  It's value is " ++ (toString n)
     Err msg -> "got the following error: " ++ msg
 
+-- Tuples (meant for only two items; use records for more)
+t1 = ("howard", 1)
+Tuple.first
+Tuple.second
+Tuple.first t1
+Tuple.second t2
+
 -- Algebraic data types
 -- Uppercase functions (no body arise in two scenarios)
 -- Sum types and product types
@@ -212,6 +219,7 @@ dave == dave3
 dave4 = { dave3 | email = Just "dave4@gmail.com" }
 dave3 == dave4
 
+-- Look how Elm defines this function.
 getEmail userRecord =
     case userRecord.email of
         Just address -> address
@@ -224,7 +232,26 @@ getEmail dave4
 .email dave
 .email
 
+-- Turns out that the .xxx syntax will work for any record with an xxx field
+.xyz
+
+-- Elm has a very helpful compiler.  We have a typo here
+.xyzx { name = "howard", xyz = 123 }
+
 dave |> .email |> Maybe.withDefault "No email"
+
+Maybe.withDefault
+Maybe.withDefault "Nada!"
+nada = Maybe.withDefault "Nada!"
+
+nada (Just "hpinsley@gmail.com")
+nada Nothing
+
+{ companyName = "Acme", email = Nothing}
+  |> .email |> Maybe.withDefault "No email"
+
+-- Type type can change in the record.  Person has email as an int
+.email
 
 type alias Person =
     {
@@ -250,6 +277,9 @@ type alias Comment =
   }
 
 type Responses = Responses (List Comment)
+
+-- Nice article about data modeling
+-- https://thoughtbot.com/blog/modeling-with-union-types
 
 -- Json Decoders
 import Json.Decode exposing (..)
