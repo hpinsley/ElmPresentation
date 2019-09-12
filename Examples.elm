@@ -93,6 +93,7 @@ List.range 1 50 |> filterNegateAndSort
 List.head [1,2,3]
 List.head []
 
+-- Pattern match with destructuring
 case List.head [1,2,3] of
     Just v -> v
     Nothing -> 0
@@ -106,6 +107,7 @@ myhead lst =
   case lst of
     [] -> Nothing
     head::tail -> Just head
+
 
 myhead [1,2,3]
 myhead []
@@ -231,6 +233,23 @@ type alias Person =
     }
 
 Person "Pilar" 314 |> .email
+
+-- The Elm compiler is very helpful
+type alias ProblemComment =
+  { message : String
+  , upvotes : Int
+  , downvotes : Int
+  , responses : List ProblemComment
+  }
+
+type alias Comment =
+  { message : String
+  , upvotes : Int
+  , downvotes : Int
+  , responses : Responses
+  }
+
+type Responses = Responses (List Comment)
 
 -- Json Decoders
 import Json.Decode exposing (..)
