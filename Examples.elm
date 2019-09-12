@@ -28,7 +28,32 @@ negate
 List.sort (List.map negate (List.filter (\n -> n % 2 == 0) [10,1,2,3,4,5]))
 
 [10,1,2,3,4,5]
-    |> List.filter (\n -> n %2 == 0)
+    |> List.filter (\n -> n % 2 == 0)
+    |> List.map negate
+    |> List.sort
+
+-- Lists of functions
+isDivisibleBy denom = (\n -> n % denom == 0)
+isEven = isDivisibleBy 2
+isDivisibleBy5 = isDivisibleBy 5
+isEven 2
+isEven 3
+isDivisibleBy5 15
+isDivisibleBy5 13
+
+filters = [isEven, isDivisibleBy5]
+
+filterAny filters value =
+  List.any (\fn -> fn value) filters
+
+evenOrByFive = filterAny filters
+
+evenOrByFive 2
+evenOrByFive 15
+evenOrByFive 3
+
+[10,1,2,3,4,5]
+    |> List.filter evenOrByFive
     |> List.map negate
     |> List.sort
 
@@ -46,14 +71,17 @@ squareThenDouble = double << square
 doubleThenSquare 3
 squareThenDouble 3
 
--- More function composition.  Earlier example revisited
+List.filter (\n -> n % 2 == 0)
+List.map negate
+List.sort
+(>>)
 
-[10,1,2,3,4,5]
-    |> List.filter (\n -> n %2 == 0)
-    |> List.map negate
-    |> List.sort
+filterNegateAndSort =
+  List.filter (\n -> n % 2 == 0) >>
+  List.map negate >>
+  List.sort
 
-isEven = (\n -> n % 2 == 0)
+List.range 1 50 |> filterNegateAndSort
 
 --------------------
 --The Maybe type.  Say goodbye to undefined is not a function errors
