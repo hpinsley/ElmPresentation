@@ -333,8 +333,11 @@ Json.Decode.decodeString
     {"id": 123, "email": null, "name": null}
   """
 
+BasicRendering
+SimpleCommandDemo
+GettingARandomnumber
 HTTP/JSON - Example - NY Times Api...
-
+SubscriptionDemo
 
     Everything is immutable
 Everything is an expression
