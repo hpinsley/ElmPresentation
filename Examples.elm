@@ -24,6 +24,8 @@ evens [1,2,3,4,5,6]
 -- Pipelines
 List.map
 negate
+List.filter
+List.sort
 
 List.sort (List.map negate (List.filter (\n -> n % 2 == 0) [10,1,2,3,4,5]))
 
@@ -62,11 +64,11 @@ evenOrByFive 3
 (<<)
 (>>)
 -- See this in practice
-double x = 2 * x
+dbl x = 2 * x
 square x = x * x
 
-doubleThenSquare = double >> square
-squareThenDouble = double << square
+doubleThenSquare = dbl >> square
+squareThenDouble = dbl << square
 
 doubleThenSquare 3
 squareThenDouble 3
@@ -81,6 +83,7 @@ filterNegateAndSort =
   List.map negate >>
   List.sort
 
+List.range 1 5
 List.range 1 50 |> filterNegateAndSort
 
 --------------------
