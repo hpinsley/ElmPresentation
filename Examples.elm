@@ -53,6 +53,8 @@ isDivisibleBy5 13
 
 filters = [isEven, isDivisibleBy5]
 
+List.any
+
 filterAny filters value =
   List.any (\fn -> fn value) filters
 
@@ -86,6 +88,7 @@ List.map negate
 List.sort
 (>>)
 
+-- Notice that no arguments are needed
 filterNegateAndSort =
   List.filter (\n -> n % 2 == 0) >>
   List.map negate >>
@@ -101,7 +104,7 @@ List.range 1 50 |> filterNegateAndSort
 List.head [1,2,3]
 List.head []
 
--- Pattern match with destructuring
+-- Pattern match with destructuring with case statement
 case List.head [1,2,3] of
     Just v -> v
     Nothing -> 0
@@ -115,7 +118,6 @@ myhead lst =
   case lst of
     [] -> Nothing
     head::tail -> Just head
-
 
 myhead [1,2,3]
 myhead []
