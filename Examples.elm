@@ -256,7 +256,7 @@ getEmail { name = "howard", description = "Why is my email a number?", email = 4
 .email
 
 -- Turns out that the .xxx syntax will work for any record with an xxx field
-.xyz
+.xyzzy
 
 -- Elm has a very helpful compiler.  We have a typo here
 .xyzx { name = "howard", xyz = 123 }
@@ -308,12 +308,16 @@ type Responses = Responses (List Comment)
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 
+User
+
 userDecoder =
   decode User
     |> required "id" int
     |> required "email" (nullable string) -- `null` decodes to `Nothing`
     |> optional "name" string "(fallback if name is `null` or not present)"
     |> hardcoded 1.0
+
+Json.Decode.decodeString
 
 -- Valid record
 Json.Decode.decodeString
