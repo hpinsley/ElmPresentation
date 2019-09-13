@@ -149,6 +149,11 @@ String.toFloat "123.5"
     |> List.map String.toInt
     |> List.filterMap Result.toMaybe
 
+-- Elm figures out what it needs
+Ok 1
+Err "bad num"
+-- error is a generic type; value is a generic type
+
 Ok 1 |> Result.toMaybe
 Err "this error will be dropped" |> Result.toMaybe
 
@@ -158,6 +163,10 @@ parseInt = String.toInt >> Result.toMaybe
 List.filterMap parseInt ["3", "hi", "12", "4th", "May"]
 ["3", "hi", "12", "4th", "May"] |> List.filterMap parseInt
 
+getValidInts = List.filterMap parseInt
+getValidInts ["3", "hi", "12", "4th", "May"]
+
+-- NOTE: In Elm 0.19 String.toInt returns a Maybe, not a Result
 -- Pattern matching
 case String.toInt "321" of
     Ok n -> "Got a valid integer.  It's value is " ++ (toString n)
@@ -168,7 +177,7 @@ t1 = ("howard", 1)
 Tuple.first
 Tuple.second
 Tuple.first t1
-Tuple.second t2
+Tuple.second t1
 
 -- Algebraic data types
 -- Uppercase functions (no body arise in two scenarios)
@@ -205,9 +214,6 @@ Ok ("Pilar", 17) |> GotData |> getTuple
 -- The last one worked because GotData is also an uppercase function
 GotData
 
-
--- Customer will be a function
-
 -- Records
 
 type alias User =
@@ -233,7 +239,8 @@ dave == dave3
 dave4 = { dave3 | email = Just "dave4@gmail.com" }
 dave3 == dave4
 
--- Look how Elm defines this function.
+-- Look how Elm defines this function.  What is the type
+-- of userRecord?  What is the type of the email field?
 getEmail userRecord =
     case userRecord.email of
         Just address -> address
@@ -241,6 +248,8 @@ getEmail userRecord =
 
 getEmail dave
 getEmail dave4
+getEmail { name = "howard", description = "I have no email field" }
+getEmail { name = "howard", description = "Why is my email a number?", email = 4 }
 
 -- Nice little helpers.  Each field becomes a function
 .email dave
