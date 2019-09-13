@@ -4,7 +4,8 @@ https://elm-lang.org/news/blazing-fast-html-round-two
 https://redux.js.org/introduction/prior-art
 -- Nice description of the architecture
 http://toreto.re/tea/
-
+-- Ellie
+https://ellie-app.com/new
 
 -- Partial application and how to read function annotations.
 
