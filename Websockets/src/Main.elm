@@ -2,18 +2,24 @@ module Main exposing (..)
 
 import Html exposing (Html, text, div, h1, img)
 import Html.Attributes exposing (src)
+import WebSocket
 
+serverAddress = "ws://127.0.0.1:1337"
 
 ---- MODEL ----
 
 
 type alias Model =
-    {}
+    {
+        messageReceived: String
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {}, Cmd.none )
+    ( {
+        messageReceived = "Nothing yet."
+    }, Cmd.none )
 
 
 
@@ -21,7 +27,8 @@ init =
 
 
 type Msg
-    = NoOp
+    = Echo String
+
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -36,11 +43,16 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+        [
+            h1 [] [ text model.messageReceived ]
         ]
 
-
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    let
+        sub = WebSocket.listen serverAddress Echo
+    in
+        sub
 
 ---- PROGRAM ----
 
@@ -51,5 +63,5 @@ main =
         { view = view
         , init = init
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
