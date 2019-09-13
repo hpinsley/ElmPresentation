@@ -1,25 +1,32 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, img)
-import Html.Attributes exposing (src)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import WebSocket
 
-serverAddress = "ws://127.0.0.1:1337"
+
+serverAddress =
+    "ws://127.0.0.1:1337"
+
+
 
 ---- MODEL ----
 
 
 type alias Model =
-    {
-        messageReceived: String
+    { messageToSend : String
+    , messageReceived : String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {
-        messageReceived = "Nothing yet."
-    }, Cmd.none )
+    ( { messageToSend = ""
+      , messageReceived = "Nothing yet."
+      }
+    , Cmd.none
+    )
 
 
 
@@ -27,32 +34,64 @@ init =
 
 
 type Msg
-    = Echo String
-
-
+    = GotMessage String
+    | UpdateMessageToSend String
+    | SendMessage
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        GotMessage message ->
+            ( { model | messageReceived = message }, Cmd.none)
 
+        UpdateMessageToSend message ->
+            ( { model | messageToSend = message }, Cmd.none)
 
+        SendMessage ->
+            let
+                cmd = WebSocket.send serverAddress model.messageToSend
+            in
+                ( { model | messageToSend = ""}, cmd )
 
 ---- VIEW ----
 
 
+displayMessageToSend : Model -> Html Msg
+displayMessageToSend model =
+    div [] [
+            label [][text "Mesage:"]
+            , input [onInput UpdateMessageToSend][text model.messageToSend]
+        ]
+
+
+displayMessageReceived : Model -> Html Msg
+displayMessageReceived model =
+    div [] [ text model.messageReceived ]
+
+
+displaySendButton : Model -> Html Msg
+displaySendButton model =
+    button [onClick SendMessage][text "Send"]
+
 view : Model -> Html Msg
 view model =
-    div []
-        [
-            h1 [] [ text model.messageReceived ]
+    div
+        []
+        [ displayMessageToSend model
+        , displaySendButton model
+        , displayMessageReceived model
         ]
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     let
-        sub = WebSocket.listen serverAddress Echo
+        sub =
+            WebSocket.listen serverAddress GotMessage
     in
         sub
+
+
 
 ---- PROGRAM ----
 
