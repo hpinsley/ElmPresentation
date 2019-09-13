@@ -128,13 +128,17 @@ myhead ["a","b","c"]
 [[1,2,3],[4,5,6],[],[7,8,9]]
     |> List.map List.head
 
+List.map
+List.filterMap
+List.head
+List.filterMap List.head
+
 [[1,2,3],[4,5,6],[],[7,8,9]]
     |> List.filterMap List.head
 
-List.filterMap
-
 getListHeads = List.filterMap List.head
 getListHeads [[1,2,3],[4,5,6],[],[7,8,9]]
+getListHeads [["it","dog"],[],[],["works","cat"],["with","cow"],["strings","turkey"],[],["too","mouse"]]
 
 --String.toInt and introduction to the Result type
 
