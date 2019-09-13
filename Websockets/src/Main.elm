@@ -14,15 +14,22 @@ serverAddress =
 ---- MODEL ----
 
 
+type LoginState
+    = NotLoggedIn
+    | LoggedIn String
+
+
 type alias Model =
-    { messageToSend : String
+    { loginState : LoginState
+    , messageToSend : String
     , messageReceived : String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { messageToSend = ""
+    ( { loginState = NotLoggedIn
+      , messageToSend = ""
       , messageReceived = "Nothing yet."
       }
     , Cmd.none
@@ -34,34 +41,58 @@ init =
 
 
 type Msg
-    = GotMessage String
+    = Login
+    | GotMessage String
     | UpdateMessageToSend String
     | SendMessage
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Login ->
+            let
+                username =
+                    model.messageToSend
+
+                cmd =
+                    WebSocket.send serverAddress username
+            in
+                ( { model | messageToSend = "", loginState = LoggedIn username }, cmd )
+
         GotMessage message ->
-            ( { model | messageReceived = message }, Cmd.none)
+            ( { model | messageReceived = message }, Cmd.none )
 
         UpdateMessageToSend message ->
-            ( { model | messageToSend = message }, Cmd.none)
+            ( { model | messageToSend = message }, Cmd.none )
 
         SendMessage ->
             let
-                cmd = WebSocket.send serverAddress model.messageToSend
+                cmd =
+                    WebSocket.send serverAddress model.messageToSend
             in
-                ( { model | messageToSend = ""}, cmd )
+                ( { model | messageToSend = "" }, cmd )
+
+
 
 ---- VIEW ----
 
 
 displayMessageToSend : Model -> Html Msg
 displayMessageToSend model =
-    div [] [
-            label [][text "Mesage:"]
-            , input [onInput UpdateMessageToSend][text model.messageToSend]
-        ]
+    let
+        lbl =
+            case model.loginState of
+                NotLoggedIn ->
+                    "Enter your username:"
+
+                LoggedIn username ->
+                    username ++ ", enter message:"
+    in
+        div []
+            [ label [] [ text lbl ]
+            , input [ onInput UpdateMessageToSend, value model.messageToSend ] []
+            ]
 
 
 displayMessageReceived : Model -> Html Msg
@@ -69,16 +100,22 @@ displayMessageReceived model =
     div [] [ text model.messageReceived ]
 
 
-displaySendButton : Model -> Html Msg
-displaySendButton model =
-    button [onClick SendMessage][text "Send"]
+displayActionButton : Model -> Html Msg
+displayActionButton model =
+    case model.loginState of
+        NotLoggedIn ->
+            button [ onClick Login ] [ text "Login" ]
+
+        LoggedIn _ ->
+            button [ onClick SendMessage ] [ text "Send" ]
+
 
 view : Model -> Html Msg
 view model =
     div
         []
         [ displayMessageToSend model
-        , displaySendButton model
+        , displayActionButton model
         , displayMessageReceived model
         ]
 
