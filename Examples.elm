@@ -11,9 +11,16 @@ https://ellie-app.com/new
 
 List.map
 List.map (\v -> v * 2) [1,2,3]
+
 double = List.map (\v -> v * 2)
 double
 double [1,2,3]
+
+words = String.split " " "the quick brown fox jumped over the lazy yellow dog"
+List.map
+String.reverse
+reverseStrings = List.map String.reverse
+reverseStrings words
 
 List.filter
 List.filter (\v -> v % 2 == 0) [1,2,3,4,5,6]
