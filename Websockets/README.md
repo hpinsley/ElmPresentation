@@ -1,5 +1,5 @@
 cd Server
-npm main.js
+node main.js
 then
 cd ..
 elm-app start

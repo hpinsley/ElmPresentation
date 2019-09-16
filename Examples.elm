@@ -365,6 +365,7 @@ SimpleCommandDemo
 GettingARandomnumber
 HTTP/JSON - Example - NY Times Api...
 SubscriptionDemo
+WebSocket Demo
 
     Everything is immutable
 Everything is an expression

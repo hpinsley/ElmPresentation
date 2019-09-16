@@ -60,10 +60,10 @@ wsServer.on('request', function(request) {
   var userColor = false;
   console.log((new Date()) + ' Connection accepted.');
   // send back chat history
-  if (history.length > 0) {
-    connection.sendUTF(
-        JSON.stringify({ type: 'history', data: history} ));
-  }
+  // if (history.length > 0) {
+  //   connection.sendUTF(
+  //       JSON.stringify({ type: 'history', data: history} ));
+  // }
   // user sent some message
   connection.on('message', function(message) {
     if (message.type === 'utf8') { // accept only text

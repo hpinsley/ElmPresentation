@@ -4,8 +4,56 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import WebSocket
+import Time exposing (..)
+import Json.Decode exposing (..)
+import Json.Decode.Pipeline exposing (..)
+
+type alias Username = String
+type alias Color = String
+
+sampleLoginMessage: String
+sampleLoginMessage = """{"type":"color","data":"blue"}"""
+
+sampleMessage: String
+sampleMessage = """
+{"type":"message","data":{"time":1568629623261,"text":"hi","author":"howard","color":"green"}}
+"""
+
+type LoginMessage =
+    LoginMessage Color
+
+type alias ChatData = {
+    text: String
+    , author: String
+    , color: String
+}
+
+chatDataDecoder: Decoder ChatData
+chatDataDecoder =
+    decode ChatData
+        |> Json.Decode.Pipeline.required "text" string
+        |> Json.Decode.Pipeline.required "author" string
+        |> Json.Decode.Pipeline.required "color" string
+
+type alias ChatMessage =
+    {
+            type_: String
+          , data: ChatData
+    }
+
+chatMessageDecoder: Decoder ChatMessage
+chatMessageDecoder =
+    decode ChatMessage
+        |> Json.Decode.Pipeline.required "type" string
+        |> Json.Decode.Pipeline.required "data" chatDataDecoder
+
+loginDecoder: Decoder LoginMessage
+loginDecoder =
+    decode LoginMessage
+    |> Json.Decode.Pipeline.required "data" string
 
 
+serverAddress: String
 serverAddress =
     "ws://127.0.0.1:1337"
 
@@ -13,10 +61,10 @@ serverAddress =
 
 ---- MODEL ----
 
-
 type LoginState
     = NotLoggedIn
-    | LoggedIn String
+    | LoggingInAs Username
+    | LoggedIn Username Color
 
 
 type alias Model =
@@ -46,7 +94,6 @@ type Msg
     | UpdateMessageToSend String
     | SendMessage
 
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -58,10 +105,23 @@ update msg model =
                 cmd =
                     WebSocket.send serverAddress username
             in
-                ( { model | messageToSend = "", loginState = LoggedIn username }, cmd )
+                ( { model | messageToSend = "", loginState = LoggingInAs username }, cmd )
 
         GotMessage message ->
-            ( { model | messageReceived = message }, Cmd.none )
+            case model.loginState of
+                LoggingInAs username ->
+                    case decodeString loginDecoder message of
+                        Err errMsg ->
+                            ( { model | messageReceived = errMsg}, Cmd.none )
+                        Ok (LoginMessage color) ->
+                            ( { model | messageReceived = "Your color is " ++ color, loginState = LoggedIn username color}, Cmd.none)
+
+                _ ->
+                    case decodeString chatMessageDecoder message of
+                        Err errMsg ->
+                            ( { model | messageReceived = errMsg}, Cmd.none )
+                        Ok chatMessage ->
+                            ( { model | messageReceived = chatMessage.data.text }, Cmd.none )
 
         UpdateMessageToSend message ->
             ( { model | messageToSend = message }, Cmd.none )
@@ -86,12 +146,15 @@ displayMessageToSend model =
                 NotLoggedIn ->
                     "Enter your username:"
 
-                LoggedIn username ->
-                    username ++ ", enter message:"
+                LoggingInAs username ->
+                    "Attempting to login as " ++ username
+
+                LoggedIn username color ->
+                    username ++ " (" ++ color ++ "), enter message:"
     in
         div []
             [ label [] [ text lbl ]
-            , input [ onInput UpdateMessageToSend, value model.messageToSend ] []
+            , input [ onInput UpdateMessageToSend, Html.Attributes.value model.messageToSend ] []
             ]
 
 
@@ -106,15 +169,19 @@ displayActionButton model =
         NotLoggedIn ->
             button [ onClick Login ] [ text "Login" ]
 
-        LoggedIn _ ->
+        LoggedIn _ _->
             button [ onClick SendMessage ] [ text "Send" ]
 
+        LoggingInAs username ->
+            text <| "Attempting to login at " ++ username
 
 view : Model -> Html Msg
 view model =
     div
         []
-        [ displayMessageToSend model
+        [
+          h1 [][text "WebSockets Cmd and Sub"]
+        , displayMessageToSend model
         , displayActionButton model
         , displayMessageReceived model
         ]
