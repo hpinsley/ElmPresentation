@@ -17,14 +17,18 @@ input {
 }
 
 button {
-  font-size: 40pt;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  font-size: 20pt;
+  margin-left: 20px;
 }
 
 div#loginState {
-  width: 100vw;
+  text-align: center;
+  width: 80vw;
+  margin-left: 10vw;
+  margin-bottom: 10px;
   border: 1px solid black;
+  border-radius: 5px;
+  padding: 4px;
   height: 40px;
   font-size: 20pt;
 }

@@ -155,6 +155,7 @@ displayMessageToSend model =
         div []
             [ label [] [ text lbl ]
             , input [ onInput UpdateMessageToSend, Html.Attributes.value model.messageToSend ] []
+            , displayActionButton model
             ]
 
 messageRow : ChatData -> Html Msg
@@ -199,7 +200,7 @@ displayActionButton model =
             button [ onClick SendMessage ] [ text "Send" ]
 
         LoggingInAs username ->
-            text <| "Attempting to login at " ++ username
+            text ""
 
 displayLoginState : Model -> Html Msg
 displayLoginState model =
@@ -226,7 +227,6 @@ view model =
           h1 [][text "WebSockets Cmd and Sub"]
         , displayLoginState model
         , displayMessageToSend model
-        , displayActionButton model
         , displayMessages model
         ]
 
