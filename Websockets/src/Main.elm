@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import WebSocket
 import Time exposing (..)
+import Time.Format exposing (..)
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 
@@ -23,9 +24,10 @@ type LoginMessage =
     LoginMessage Color
 
 type alias ChatData = {
-    text: String
+      text: String
     , author: String
     , color: String
+    , time: Maybe Time
 }
 
 chatDataDecoder: Decoder ChatData
@@ -34,6 +36,7 @@ chatDataDecoder =
         |> Json.Decode.Pipeline.required "text" string
         |> Json.Decode.Pipeline.required "author" string
         |> Json.Decode.Pipeline.required "color" string
+        |> Json.Decode.Pipeline.required "time" (nullable float)
 
 type alias ChatMessage =
     {
@@ -73,6 +76,11 @@ type alias Model =
     , messagesReceived: List ChatData
     }
 
+type Msg
+    = Login
+    | GotMessage String
+    | UpdateMessageToSend String
+    | SendMessage
 
 init : ( Model, Cmd Msg )
 init =
@@ -83,16 +91,16 @@ init =
     , Cmd.none
     )
 
-
-
----- UPDATE ----
-
-
-type Msg
-    = Login
-    | GotMessage String
-    | UpdateMessageToSend String
-    | SendMessage
+view : Model -> Html Msg
+view model =
+    div
+        []
+        [
+          h1 [][text "WebSockets Cmd and Sub"]
+        , displayLoginState model
+        , displayMessageToSend model
+        , displayMessages model
+        ]
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -133,11 +141,6 @@ update msg model =
             in
                 ( { model | messageToSend = "" }, cmd )
 
-
-
----- VIEW ----
-
-
 displayMessageToSend : Model -> Html Msg
 displayMessageToSend model =
     let
@@ -161,14 +164,21 @@ displayMessageToSend model =
 messageRow : ChatData -> Html Msg
 messageRow chatData =
     tr [] [
-          td [style [("color", chatData.color)]][text chatData.author]
+          td [][text (getTimeText chatData.time)]
+        , td [style [("color", chatData.color)]][text chatData.author]
         , td [][text chatData.text]
     ]
 
-addMessage: Username -> Color -> String -> Model -> Model
-addMessage author color text model =
+getTimeText: Maybe Time -> String
+getTimeText timeOption =
+    case timeOption of
+        Nothing -> ""
+        Just t -> format "%I:%M:%S %p" t
+
+addMessage: Username -> Color -> String -> (Maybe Time) -> Model -> Model
+addMessage author color text timeOption  model =
     let
-        msg = { author = author, color = color, text = text }
+        msg = { author = author, color = color, text = text, time = timeOption }
         msgs = msg :: model.messagesReceived
     in
         { model | messagesReceived = msgs }
@@ -179,7 +189,7 @@ addErrorMessage errMsg model =
     let
         txt = "Error " ++ errMsg
     in
-        addMessage "system" "red" txt model
+        addMessage "system" "red" txt Nothing model
 
 displayMessages : Model -> Html Msg
 displayMessages model =
@@ -218,18 +228,6 @@ displayLoginState model =
 
     in
         div [id "loginState"] content
-
-view : Model -> Html Msg
-view model =
-    div
-        []
-        [
-          h1 [][text "WebSockets Cmd and Sub"]
-        , displayLoginState model
-        , displayMessageToSend model
-        , displayMessages model
-        ]
-
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
