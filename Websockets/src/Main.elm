@@ -193,7 +193,7 @@ addErrorMessage errMsg model =
 
 displayMessages : Model -> Html Msg
 displayMessages model =
-    table [][
+    table [id "msgTable"][
          thead [][]
         ,model.messagesReceived
             |> List.map messageRow
