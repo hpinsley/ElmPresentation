@@ -21,3 +21,10 @@ button {
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
+div#loginState {
+  width: 100vw;
+  border: 1px solid black;
+  height: 40px;
+  font-size: 20pt;
+}

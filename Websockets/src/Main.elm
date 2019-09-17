@@ -174,6 +174,23 @@ displayActionButton model =
 
         LoggingInAs username ->
             text <| "Attempting to login at " ++ username
+            
+displayLoginState : Model -> Html Msg
+displayLoginState model =
+    let content =
+        case model.loginState of
+            NotLoggedIn -> [text "You are not logged in."]
+            LoggingInAs name -> [text name]
+            LoggedIn name color ->
+                [
+                      span [][text "You are logged in as "]
+                    , span [style [("color", color)]][text name]
+                    , span [][text " with color "]
+                    , span [style [("color", color)]][text color]
+                ]
+
+    in
+        div [id "loginState"] content
 
 view : Model -> Html Msg
 view model =
@@ -181,6 +198,7 @@ view model =
         []
         [
           h1 [][text "WebSockets Cmd and Sub"]
+        , displayLoginState model
         , displayMessageToSend model
         , displayActionButton model
         , displayMessageReceived model
