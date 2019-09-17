@@ -70,7 +70,7 @@ type LoginState
 type alias Model =
     { loginState : LoginState
     , messageToSend : String
-    , messageReceived : String
+    , messagesReceived: List ChatData
     }
 
 
@@ -78,7 +78,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { loginState = NotLoggedIn
       , messageToSend = ""
-      , messageReceived = "Nothing yet."
+      , messagesReceived = []
       }
     , Cmd.none
     )
@@ -112,16 +112,16 @@ update msg model =
                 LoggingInAs username ->
                     case decodeString loginDecoder message of
                         Err errMsg ->
-                            ( { model | messageReceived = errMsg}, Cmd.none )
+                            ( addErrorMessage errMsg model, Cmd.none )
                         Ok (LoginMessage color) ->
-                            ( { model | messageReceived = "Your color is " ++ color, loginState = LoggedIn username color}, Cmd.none)
+                            ( { model | loginState = LoggedIn username color}, Cmd.none)
 
                 _ ->
                     case decodeString chatMessageDecoder message of
                         Err errMsg ->
-                            ( { model | messageReceived = errMsg}, Cmd.none )
+                            ( addErrorMessage errMsg model, Cmd.none )
                         Ok chatMessage ->
-                            ( { model | messageReceived = chatMessage.data.text }, Cmd.none )
+                            ( model, Cmd.none )
 
         UpdateMessageToSend message ->
             ( { model | messageToSend = message }, Cmd.none )
@@ -150,18 +150,37 @@ displayMessageToSend model =
                     "Attempting to login as " ++ username
 
                 LoggedIn username color ->
-                    username ++ " (" ++ color ++ "), enter message:"
+                    "Enter message:"
     in
         div []
             [ label [] [ text lbl ]
             , input [ onInput UpdateMessageToSend, Html.Attributes.value model.messageToSend ] []
             ]
 
+messageRow : ChatData -> Html Msg
+messageRow chatData =
+    tr [] [
+          td [style [("color", chatData.color)]][text chatData.author]
+        , td [][text chatData.text]
+    ]
 
-displayMessageReceived : Model -> Html Msg
-displayMessageReceived model =
-    div [] [ text model.messageReceived ]
+addErrorMessage: String -> Model -> Model
+addErrorMessage errMsg model =
+    let
+        txt = "Error " ++ errMsg
+        msg = { author = "system", color = "red", text = txt }
+        msgs = msg :: model.messagesReceived
+    in
+        { model | messagesReceived = msgs }
 
+displayMessages : Model -> Html Msg
+displayMessages model =
+    table [][
+         thead [][]
+        ,model.messagesReceived
+            |> List.map messageRow
+            |> tbody []
+    ]
 
 displayActionButton : Model -> Html Msg
 displayActionButton model =
@@ -174,7 +193,7 @@ displayActionButton model =
 
         LoggingInAs username ->
             text <| "Attempting to login at " ++ username
-            
+
 displayLoginState : Model -> Html Msg
 displayLoginState model =
     let content =
@@ -201,7 +220,7 @@ view model =
         , displayLoginState model
         , displayMessageToSend model
         , displayActionButton model
-        , displayMessageReceived model
+        , displayMessages model
         ]
 
 
