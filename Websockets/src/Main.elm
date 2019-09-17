@@ -121,7 +121,7 @@ update msg model =
                         Err errMsg ->
                             ( addErrorMessage errMsg model, Cmd.none )
                         Ok chatMessage ->
-                            ( model, Cmd.none )
+                            ( { model | messagesReceived = chatMessage.data :: model.messagesReceived}, Cmd.none )
 
         UpdateMessageToSend message ->
             ( { model | messageToSend = message }, Cmd.none )
@@ -164,14 +164,21 @@ messageRow chatData =
         , td [][text chatData.text]
     ]
 
+addMessage: Username -> Color -> String -> Model -> Model
+addMessage author color text model =
+    let
+        msg = { author = author, color = color, text = text }
+        msgs = msg :: model.messagesReceived
+    in
+        { model | messagesReceived = msgs }
+
+
 addErrorMessage: String -> Model -> Model
 addErrorMessage errMsg model =
     let
         txt = "Error " ++ errMsg
-        msg = { author = "system", color = "red", text = txt }
-        msgs = msg :: model.messagesReceived
     in
-        { model | messagesReceived = msgs }
+        addMessage "system" "red" txt model
 
 displayMessages : Model -> Html Msg
 displayMessages model =
