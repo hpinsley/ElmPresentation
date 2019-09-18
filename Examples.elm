@@ -260,6 +260,7 @@ getEmail userRecord =
 
 getEmail dave
 getEmail dave4
+
 getEmail { name = "howard", description = "I have no email field" }
 getEmail { name = "howard", description = "Why is my email a number?", email = 4 }
 
