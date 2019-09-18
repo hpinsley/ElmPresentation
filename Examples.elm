@@ -10,6 +10,7 @@ https://ellie-app.com/new
 -- Partial application and how to read function annotations.
 
 List.map
+[1,2,3]
 List.map (\v -> v * 2) [1,2,3]
 
 double = List.map (\v -> v * 2)
@@ -36,6 +37,9 @@ List.filter
 List.sort
 
 List.sort (List.map negate (List.filter (\n -> n % 2 == 0) [10,1,2,3,4,5]))
+
+--The pipe operator passes the first argument to the second (func) arg
+(|>)
 
 [10,1,2,3,4,5]
     |> List.filter (\n -> n % 2 == 0)
@@ -141,9 +145,15 @@ getListHeads [[1,2,3],[4,5,6],[],[7,8,9]]
 getListHeads [["it","dog"],[],[],["works","cat"],["with","cow"],["strings","turkey"],[],["too","mouse"]]
 
 --String.toInt and introduction to the Result type
+--Changed in 0.19
 
 String.toInt "abc"
 String.toFloat "123.5"
+
+Result.toMaybe
+
+String.toInt "abc" |> Result.toMaybe
+String.toInt "314" |> Result.toMaybe
 
 ["3", "hi", "12", "4th", "May"]
     |> List.map String.toInt
@@ -151,6 +161,7 @@ String.toFloat "123.5"
 
 -- Elm figures out what it needs
 Ok 1
+Ok "string"
 Err "bad num"
 -- error is a generic type; value is a generic type
 
@@ -180,7 +191,7 @@ Tuple.first t1
 Tuple.second t1
 
 -- Algebraic data types
--- Uppercase functions (no body arise in two scenarios)
+-- Uppercase "constructor" functions (no body arise in two scenarios)
 -- Sum types and product types
 -- Msg is a sum type
 -- Message String is a product type
@@ -197,6 +208,7 @@ GotData (Err "The server is broken")
 validData = GotData (Ok ("howard", 123))
 
 -- Define a function to parse a message into a tuple
+-- A bit of a contrived example
 getTuple msg =
     case msg of
         GotData result ->
