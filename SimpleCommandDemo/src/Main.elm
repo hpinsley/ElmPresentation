@@ -17,15 +17,9 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { clickCount = 0
-      }
-    , Cmd.none
-    )
-
-
+    ( { clickCount = 0}, Cmd.none )
 
 ---- UPDATE ----
-
 
 type Msg
     = IncrementClickCount
