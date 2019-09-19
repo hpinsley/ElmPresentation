@@ -9,8 +9,8 @@ https://ellie-app.com/new
 
 -- Partial application and how to read function annotations.
 
-List.map
 [1,2,3]
+List.map
 List.map (\v -> v * 2) [1,2,3]
 
 double = List.map (\v -> v * 2)
@@ -19,9 +19,14 @@ double [1,2,3]
 
 words = String.split " " "the quick brown fox jumped over the lazy yellow dog"
 List.map
+
 String.reverse
 reverseStrings = List.map String.reverse
 reverseStrings words
+
+String.length
+charCounts = List.map String.length
+charCounts words
 
 List.filter
 List.filter (\v -> v % 2 == 0) [1,2,3,4,5,6]
@@ -62,7 +67,7 @@ List.any
 filterAny filters value =
   List.any (\fn -> fn value) filters
 
-evenOrByFive = filterAny filters
+evenOrByFive = filterAny [isEven, isDivisibleBy5]
 
 evenOrByFive 2
 evenOrByFive 15
@@ -123,12 +128,17 @@ myhead lst =
     [] -> Nothing
     head::tail -> Just head
 
+List.head
+myhead
+
 myhead [1,2,3]
 myhead []
 myhead ["a","b","c"]
 
 -- List.filterMap -- if you have a list of maybes
 -- Get the heads each embedded list
+[[1,2,3],[4,5,6],[],[7,8,9]]
+
 [[1,2,3],[4,5,6],[],[7,8,9]]
     |> List.map List.head
 
@@ -373,14 +383,18 @@ Json.Decode.decodeString
     {"id": 123, "email": null, "name": null}
   """
 
+Architecture
+============
 BasicRendering
 SimpleCommandDemo
 GettingARandomnumber
 HTTP/JSON - Example - NY Times Api...
 SubscriptionDemo
 WebSocket Demo
+Interop Demo (ProjectBeta)
+Svg - Multiple samples
 
-    Everything is immutable
+Everything is immutable
 Everything is an expression
 Functions guarantee same results with same inputs
 Functions do not cause side effects (no modifiying external state)
