@@ -233,7 +233,7 @@ getTuple (GetData "david")
 getTuple <| GotData (Err "The server is broken!")
 Ok ("Pilar", 17) |> GotData |> getTuple
 
--- The last one worked because GotData is also an uppercase function
+-- The last one worked because GotData is also an uppercase "constructor" function
 GotData
 
 -- Records
@@ -271,6 +271,7 @@ getEmail userRecord =
 getEmail dave
 getEmail dave4
 
+-- Elm has a very helpful compiler
 getEmail { name = "howard", description = "I have no email field" }
 getEmail { name = "howard", description = "Why is my email a number?", email = 4 }
 
@@ -337,50 +338,40 @@ userDecoder =
   decode User
     |> required "id" int
     |> required "email" (nullable string) -- `null` decodes to `Nothing`
-    |> optional "name" string "(fallback if name is `null` or not present)"
+    |> optional "name" string "John Default"
     |> hardcoded 1.0
 
 Json.Decode.decodeString
 
+decodeUser = Json.Decode.decodeString userDecoder
+
 -- Valid record
-Json.Decode.decodeString
-  userDecoder
+decodeUser
   """
     {"id": 123, "email": "sam@example.com", "name": "Sam Sample"}
   """
 
 -- Valid record with no optional email
-Json.Decode.decodeString
-  userDecoder
-  """
-    {"id": 123, "email": null, "name": "Sam Sample"}
-  """
--- Valid
-Json.Decode.decodeString
-  userDecoder
-  """
-    {"id": 123, "email": null, "name": "Sam Sample"}
-  """
-
--- Null email is valid
-Json.Decode.decodeString
-  userDecoder
+decodeUser
   """
     {"id": 123, "email": null, "name": "Sam Sample"}
   """
 
 -- Missing email is invalid
-Json.Decode.decodeString
-  userDecoder
+decodeUser
   """
     {"id": 123, "name": "Sam Sample"}
   """
-
--- Invalid - null or missing name
+-- Default for null name
+decodeUser
+  """
+    {"id": 123, "email": null, "name": null}
+  """
+-- Default for missing name
 Json.Decode.decodeString
   userDecoder
   """
-    {"id": 123, "email": null, "name": null}
+    {"id": 123, "email": null}
   """
 
 Architecture
