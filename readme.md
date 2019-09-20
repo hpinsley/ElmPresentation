@@ -83,3 +83,17 @@ This example demonstrates two separate subscriptions:
     cd SubscriptionDemo
     elm-app start
 
+### Websockets ###
+
+This example demonstrates how the Elm subscription mechanism is used to interact with a server of Web Sockets.  The example requires a server (startup instructions below)
+
+First start a simple node websocket server application
+
+    cd Websockets/Server
+    node main.js
+
+Then run the Elm app
+
+    cd Websockets
+    elm-app start
+
