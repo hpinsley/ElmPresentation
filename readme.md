@@ -80,6 +80,8 @@ This example demonstrates two separate subscriptions:
 
 - Mouse movements.  This subscription causes the position of the mouse to be sent to your update function in the form of a custom Msg whenever the mouse's position changes.
 
+The example also shows how to handle more then one subscription.
+
     cd SubscriptionDemo
     elm-app start
 
