@@ -87,7 +87,7 @@ The example also shows how to handle more then one subscription.
 
 ### Websockets ###
 
-This example demonstrates how the Elm subscription mechanism is used to interact with a server of Web Sockets.  The example requires a server (startup instructions below)
+This example demonstrates how the Elm subscription mechanism is used to interact with a server over Web Sockets.  The example requires a server (startup instructions below)
 
 First start a simple node websocket server application
 
